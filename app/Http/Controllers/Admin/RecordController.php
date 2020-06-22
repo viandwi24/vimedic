@@ -30,8 +30,14 @@ class RecordController extends Controller
                     $record_json = "onclick='vm.editModal(" .
                         json_encode($record).
                         ")'";
+                    $record_action_qrcode = "onclick='vm.printQrcode(" .
+                        json_encode($record).
+                        ")'";
                     return '
                         <div class="text-center">
+                            <button '.$record_action_qrcode.' type="button" class="btn btn-sm btn-primary">
+                                <i class="fa fa-qrcode"></i>
+                            </button>
                             <button '.$record_json.' type="button" class="btn btn-sm btn-warning">
                                 <i class="fa fa-edit"></i>
                             </button>
