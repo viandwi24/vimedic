@@ -5,11 +5,11 @@
         ['type' => 'item', 'role' => "all", 'text' => 'Dashboard', 'link' => route('admin.home'), 'icon' => 'fa-tachometer-alt'],
 
         ['type' => 'header', 'role' => "all", 'text' => 'Master Data'],
-        ['type' => 'item', 'role' => ['admin'], 'text' => 'Employees', 'link' => url('/awe'), 'icon' => 'fa-user-secret'],
+        ['type' => 'item', 'role' => ['admin'], 'text' => 'Users', 'link' => route('admin.user.index'), 'icon' => 'fa-user-secret'],
         ['type' => 'item', 'role' => ['admin', 'employee'], 'text' => 'Medicines', 'link' => route('admin.medicine.index'), 'icon' => 'fa-pills'],
         ['type' => 'item', 'role' => ['admin', 'doctor'], 'text' => 'Patients', 'link' => route('admin.patient.index'), 'icon' => 'fa-users'],
         ['type' => 'item', 'role' => ['admin', 'doctor'], 'text' => 'Recipes', 'link' => route('admin.recipe.index'), 'icon' => 'fa-medkit'],
-        ['type' => 'item', 'role' => ['admin', 'doctor'], 'text' => 'Records', 'link' => url('/awe'), 'icon' => 'fa-book'],
+        ['type' => 'item', 'role' => ['admin', 'doctor'], 'text' => 'Records', 'link' => route('admin.record.index'), 'icon' => 'fa-book'],
 
         // ['type' => 'header', 'role' => "all", 'text' => 'Input'],
         // ['type' => 'item', 'role' => ['admin', 'doctor'], 'text' => 'Create Record', 'link' => url('/awe'), 'icon' => 'fa-sticky-note'],

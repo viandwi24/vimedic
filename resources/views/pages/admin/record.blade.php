@@ -1,4 +1,4 @@
-@extends('layouts.admin', ['title' => "Recipes"])
+@extends('layouts.admin', ['title' => "Records"])
 
 @section('content')
     <div class="container-fluid">
@@ -8,7 +8,7 @@
                     <div class="card-header">
                         <h3 class="card-title">
                             <i class="fa fa-users mr-2"></i>
-                            Recipe List
+                            Record List
                         </h3>
 
                         <span class="card-right-button">
@@ -28,10 +28,9 @@
                         <table id="table" class="table table-bordered table-hover">
                             <thead>
                                 <th width="6%">#</th>
+                                <th>Patient</th>
                                 <th>Doctor</th>
                                 <th>Code</th>
-                                <th>Total Price</th>
-                                <th>Status</th>
                                 <th class="text-center">...</th>
                             </thead>
                         </table>
@@ -46,8 +45,8 @@
         <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="modalLabel" v-if="action == 'create'">Add New Recipe</h5>
-                <h5 class="modal-title" id="modalLabel" v-if="action == 'edit'">Edit Recipe</h5>
+                <h5 class="modal-title" id="modalLabel" v-if="action == 'create'">Add New Record</h5>
+                <h5 class="modal-title" id="modalLabel" v-if="action == 'edit'">Edit Record</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -68,52 +67,34 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Note</label>
-                        <textarea name="note" class="form-control" v-model="recipe.note"></textarea>
+                        <label>Patient</label>
+                        <select
+                          name="patient_id"
+                          class="select2 form-control"
+                          id="selectPatient">
+                        </select>
                     </div>
-                    <hr>
-                    <h4>Carts</h4>
-                    <div class="row mb-2">
-                        <div class="col-10">
-                            <select class="select2 form-control" id="selectMedicine"></select>
-                        </div>
-                        <div class="col-2">
-                            <button type="button" @click.prevent="addCart" class="btn btn-success btn-block">
-                                <i class="fa fa-plus"></i>
-                            </button>
+                    <div class="form-group">
+                        <label>Checkup</label>
+                        <input type="text" name="checkup" class="form-control" v-model="record.checkup" placeholder="Ex: check the stomach...">
+                    </div>
+                    <div class="form-group">
+                        <label>Diagnosis</label>
+                        <input type="text" name="diagnosis" class="form-control" v-model="record.diagnosis" placeholder="Ex: ulcer, maag...">
+                    </div>
+                    <div class="form-group">
+                        <label>Action</label>
+                        <input type="text" name="action" class="form-control" v-model="record.action" placeholder="Ex : taking medication...">
+                    </div>
+                    <div class="form-group">
+                        <label>Cost</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">Rp</span>
+                            </div>
+                            <input type="number" min="0" name="cost" class="form-control" v-model="record.cost">
                         </div>
                     </div>
-                    <table class="table table-bordered table-hover">
-                        <thead>
-                            <th>Name</th>
-                            <th>Stock</th>
-                            <th>Total</th>
-                        </thead>
-                        <tbody>
-                            <tr v-for="(item, i) in carts" :key="i">
-                                <td>@{{ item.name }}</td>
-                                <td>
-                                    x <input type="number" min="1" style="width: 50px;" v-model="item.stock" :max="item.max">
-                                    <button class="btn btn-sm btn-danger" @click.prevent="delCart(i)">
-                                        <i class="fa fa-times"></i>
-                                    </button>
-                                </td>
-                                <td>
-                                    Rp@{{ item.price*item.stock }}
-                                </td>
-                            </tr>
-                            <tr v-if="carts.length == 0" class="text-center">
-                                <td colspan="3">
-                                    <b>No item found.</b>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colspan="3" class="text-right">
-                                    <b>Total : Rp @{{ totalPriceCart }}</b>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
                 </form>
             </div>
             <div class="modal-footer">
@@ -132,10 +113,10 @@
             el: '#app',
             data: {
                 action: 'create',
-                recipe: {},
+                record: {},
                 doctors: @JSON($doctors->array()),
-                medicines: @JSON($medicines->array()),
-                medicinesOriginal: @JSON($medicines->original()),
+                patients: @JSON($patients->array()),
+                recipes: @JSON($recipes->array()),
                 carts: [],
             },
             computed: {
@@ -148,7 +129,7 @@
             methods: {
                 loadSelect2() {
                     $('#selectDoctor').select2({ data: this.doctors });
-                    $('#selectMedicine').select2({ data: this.medicines });
+                    $('#selectPatient').select2({ data: this.patients });
 
                     @if(auth()->check() && auth()->user()->role == "doctor")
                         $('#selectDoctor').attr('disabled', true);
@@ -156,9 +137,13 @@
                 },
                 addModal() {
                     this.action = 'create';
-                    this.recipe = {
+                    this.record = {
                         doctor: null,
-                        note: null,
+                        patient: null,
+                        checkup: "",
+                        diagnosis: "",
+                        action: "",
+                        cost: 1000,
                     }
                     this.loadSelect2();
 
@@ -170,51 +155,37 @@
                 },
                 editModal(recipe) {
                     this.action = 'edit';
-                    this.recipe = recipe;
-                    this.recipe.doctor = this.recipe.doctor_id;
+                    this.record = recipe;
+                    this.record.doctor = this.record.doctor_id;
+                    this.record.patient = this.record.patient_id;
                     this.loadSelect2();
-                    this.carts = this.recipe.medicines;
-                    $('#selectDoctor').val(this.recipe.doctor).trigger('change').trigger('click');
+                    this.carts = this.record.medicines;
+                    $('#selectDoctor').val(this.record.doctor).trigger('change').trigger('click');
+                    $('#selectPatient').val(this.record.patient).trigger('change').trigger('click');
                     $('.modal#modal').modal('show');
                 },
                 create() {
                     $('.modal#modal form input[name=carts]').val( JSON.stringify(this.carts) );
-                    $('.modal#modal form').attr('action', "{{ route('admin.recipe.store') }}").submit();
+                    $('.modal#modal form').attr('action', "{{ route('admin.record.store') }}").submit();
                 },
                 update() {
-                    let id = this.recipe.id;
+                    let id = this.record.id;
                     $('.modal#modal form input[name=carts]').val( JSON.stringify(this.carts) );
-                    $('.modal#modal form').attr('action', "{{ route('admin.recipe.index') }}/" + id).submit();
+                    $('.modal#modal form').attr('action', "{{ route('admin.record.index') }}/" + id).submit();
                 },
-                
-                addCart() {
-                    let id = $('#selectMedicine').val();
-                    let s = this.carts.find(e => e.id === id);
-                    if (typeof s !== 'undefined') return s.stock++;
-                    let medicine = this.medicinesOriginal.find(e => e.id === parseInt(id));
-                    let name = medicine.name;
-                    let price = medicine.price;
-                    let max = medicine.stock;
-                    console.log(medicine)
-                    this.carts.push({ id, name, price, max, stock: 1 });
-                },
-                delCart(index) {
-                    this.carts.splice(index, 1);
-                }
             }
         });
 
         $('#table').DataTable({
-            ajax: "{{ route('admin.recipe.index') }}",
+            ajax: "{{ route('admin.record.index') }}",
             processing: true,
             order: [[0, 'asc']],
             columnDefs: [ { orderable: false, targets: [3] }, ],
             columns: [
                 { render: (data, type, row, meta) => meta.row + meta.settings._iDisplayStart + 1 },
                 { data: 'doctor.name' },
+                { data: 'patient.name' },
                 { data: 'code' },
-                { data: 'total_price' },
-                { data: 'status' },
                 { data: 'action' },
             ]
         });

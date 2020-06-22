@@ -9,9 +9,11 @@ Route::group([
     'middleware' => 'auth'
 ], function () {
     Route::get('/', function () { return view('pages.admin.home'); })->name('home');
+    Route::resource('/user', 'Admin\UserController')->except(['create', 'edit', 'show']);
     Route::resource('/medicine', 'Admin\MedicineController')->except(['create', 'edit', 'show']);
     Route::resource('/patient', 'Admin\PatientController')->except(['create', 'edit', 'show']);
-    Route::resource('/recipe', 'Admin\RecipeController')->except(['show']);
+    Route::resource('/recipe', 'Admin\RecipeController')->except(['create', 'edit', 'show']);
+    Route::resource('/record', 'Admin\RecordController')->except(['create', 'edit', 'show']);
 });
 
 /**

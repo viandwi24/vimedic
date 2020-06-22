@@ -15,12 +15,15 @@ class CreateRecipesTable extends Migration
     {
         Schema::create('recipes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('patient_id')->constrained();
-            $table->string('code');
+            $table->bigInteger('doctor_id')->unsigned();
+            $table->string('code')->unique();
             $table->longText('note')->nullable();
             $table->integer('total_price');
             $table->enum('status', ['already_taken', 'not_yet_taken'])->default('not_yet_taken');
             $table->timestamps();
+
+            $table->foreign('doctor_id')->references('id')->on('users')
+                ->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

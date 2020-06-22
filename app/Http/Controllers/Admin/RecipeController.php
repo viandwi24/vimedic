@@ -7,6 +7,7 @@ use App\Models\Medicine;
 use App\Models\Patient;
 use App\Models\Recipe;
 use App\Services\Select2;
+use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -25,7 +26,7 @@ class RecipeController extends Controller
     {
         if ($request->ajax())
         {
-            $recipes = Recipe::with('patient')->get();
+            $recipes = Recipe::with('doctor')->get();
             return DataTables::of($recipes)
                 ->addColumn('action', function (Recipe $recipe) {
                     $recipe_arr = $recipe->toArray();
@@ -57,13 +58,13 @@ class RecipeController extends Controller
         }
 
         // get patient data anc convert to Select2 pattern
-        $patients = Patient::select('id', 'identity_number', 'name')->get();
-        $patients = (new Select2)->data($patients)->pattern(['name', 'identity_number']);
+        $doctors = User::select('id', 'name')->where('role', 'doctor')->get();
+        $doctors = (new Select2)->data($doctors)->pattern(['id', 'name']);
         $medicines = Medicine::select('id', 'name', 'stock', 'price')->get();
         $medicines = (new Select2)->data($medicines)->pattern(['id', 'name']);
 
         // return view
-        return view('pages.admin.recipe.index', compact('patients', 'medicines'));
+        return view('pages.admin.recipe.index', compact('doctors', 'medicines'));
     }
 
     /**
@@ -85,10 +86,17 @@ class RecipeController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'patient_id' => 'required|integer|exists:patients,id',
             'carts' => 'required|json',
             'note' => 'required|nullable|string',
         ]);
+
+        if (auth()->check() && auth()->user()->role == "doctor")
+        {
+            $doctor_id = auth()->user()->id;
+        } else {
+            $request->validate(['doctor_id' => 'required|integer|exists:users,id']);
+            $doctor_id = $request->doctor_id;
+        }
 
         $carts = json_decode($request->carts);
 
@@ -111,10 +119,10 @@ class RecipeController extends Controller
         $total_price = 0;
         foreach ($cart_transaction as $item) { $total_price += ($item['price']*$item['stock']); }
         
-        DB::transaction(function () use ($total_price, $cart_transaction, $request) {
+        DB::transaction(function () use ($total_price, $cart_transaction, $request, $doctor_id) {
             $transaction = Recipe::create([
                 "code" => Str::random(10) . Carbon::now()->timestamp,
-                "patient_id" => $request->patient_id,
+                "doctor_id" => $doctor_id,
                 "total_price" => $total_price,
                 "note" => $request->note,
             ]);
@@ -160,14 +168,20 @@ class RecipeController extends Controller
     public function update(Request $request, Recipe $recipe)
     {
         $request->validate([
-            'patient_id' => 'required|integer|exists:patients,id',
             'carts' => 'required|json',
             'note' => 'required|nullable|string',
         ]);
 
-        $carts = json_decode($request->carts);
-        // dd($carts);
 
+        if (auth()->check() && auth()->user()->role == "doctor")
+        {
+            $doctor_id = auth()->user()->id;
+        } else {
+            $request->validate(['doctor_id' => 'required|integer|exists:users,id']);
+            $doctor_id = $request->doctor_id;
+        }
+
+        $carts = json_decode($request->carts);
         $carts_collection = new Collection($carts);
 
         // 
@@ -187,9 +201,9 @@ class RecipeController extends Controller
         $total_price = 0;
         foreach ($cart_transaction as $item) { $total_price += ($item['price']*$item['stock']); }
         
-        DB::transaction(function () use ($total_price, $cart_transaction, $request, $recipe) {
+        DB::transaction(function () use ($total_price, $cart_transaction, $request, $recipe, $doctor_id) {
             $update = $recipe->update([
-                "patient_id" => $request->patient_id,
+                "doctor_id" => $doctor_id,
                 "total_price" => $total_price,
                 "note" => $request->note,
             ]);;
