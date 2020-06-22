@@ -30,7 +30,8 @@
                                 <th width="6%">#</th>
                                 <th>Patient</th>
                                 <th>Doctor</th>
-                                <th>Code</th>
+                                <th>Recipe Code</th>
+                                <th>Record Code</th>
                                 <th class="text-center">...</th>
                             </thead>
                         </table>
@@ -54,7 +55,6 @@
             <div class="modal-body">
                 <form action="" method="POST">
                     @csrf
-                    <input type="hidden" name="carts">
                     <div v-if="action == 'edit'">
                         @method('PUT')
                     </div>
@@ -72,6 +72,14 @@
                           name="patient_id"
                           class="select2 form-control"
                           id="selectPatient">
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Recipe</label>
+                        <select
+                          name="recipe_id"
+                          class="select2 form-control"
+                          id="selectRecipe">
                         </select>
                     </div>
                     <div class="form-group">
@@ -130,6 +138,7 @@
                 loadSelect2() {
                     $('#selectDoctor').select2({ data: this.doctors });
                     $('#selectPatient').select2({ data: this.patients });
+                    $('#selectRecipe').select2({ data: this.recipes });
 
                     @if(auth()->check() && auth()->user()->role == "doctor")
                         $('#selectDoctor').attr('disabled', true);
@@ -140,6 +149,7 @@
                     this.record = {
                         doctor: null,
                         patient: null,
+                        recipe: null,
                         checkup: "",
                         diagnosis: "",
                         action: "",
@@ -158,19 +168,19 @@
                     this.record = recipe;
                     this.record.doctor = this.record.doctor_id;
                     this.record.patient = this.record.patient_id;
+                    this.record.recipe = this.record.recipe_id;
                     this.loadSelect2();
                     this.carts = this.record.medicines;
                     $('#selectDoctor').val(this.record.doctor).trigger('change').trigger('click');
                     $('#selectPatient').val(this.record.patient).trigger('change').trigger('click');
+                    $('#selectRecipe').val(this.record.recipe).trigger('change').trigger('click');
                     $('.modal#modal').modal('show');
                 },
                 create() {
-                    $('.modal#modal form input[name=carts]').val( JSON.stringify(this.carts) );
                     $('.modal#modal form').attr('action', "{{ route('admin.record.store') }}").submit();
                 },
                 update() {
                     let id = this.record.id;
-                    $('.modal#modal form input[name=carts]').val( JSON.stringify(this.carts) );
                     $('.modal#modal form').attr('action', "{{ route('admin.record.index') }}/" + id).submit();
                 },
             }
@@ -183,8 +193,9 @@
             columnDefs: [ { orderable: false, targets: [3] }, ],
             columns: [
                 { render: (data, type, row, meta) => meta.row + meta.settings._iDisplayStart + 1 },
-                { data: 'doctor.name' },
                 { data: 'patient.name' },
+                { data: 'doctor.name' },
+                { data: 'recipe.code' },
                 { data: 'code' },
                 { data: 'action' },
             ]
