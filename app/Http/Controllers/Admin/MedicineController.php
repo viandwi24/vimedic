@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Imports\MedicineImport;
 use App\Models\Medicine;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
 class MedicineController extends Controller
@@ -122,5 +125,22 @@ class MedicineController extends Controller
     {
         $medicine->delete();
         return redirect()->route('admin.medicine.index')->with('alert', ['type' => 'success', 'text' => 'Delete data successfully.']);
+    }
+
+
+
+    public function import(Request $request)
+    {
+        $request->validate([ //csv,xls,xlsx
+            'file' => 'required|file'
+        ]);
+
+        $file = $request->file('file');
+
+        DB::transaction(function () use ($file) {
+            Excel::import(new MedicineImport, $file);
+        });
+
+        return redirect()->route('admin.medicine.index')->with('alert', ['type' => 'success', 'text' => 'Import data successfully.']);
     }
 }

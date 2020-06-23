@@ -88,7 +88,7 @@ class RecordController extends Controller
         ]);
 
         $data = $request->only(
-            'patient_id', 'doctor_id', 'checkup', 'recipe_id',
+            'patient_id', 'checkup', 'recipe_id',
             'diagnosis', 'action', 'cost'
         );
         $data['code'] = Str::random(10) . Carbon::now()->timestamp;
@@ -97,7 +97,7 @@ class RecordController extends Controller
         {
             $data['doctor_id'] = auth()->user()->id;
         } else {
-            $request->validate(['required|integer|min:1|exists:users,id']);
+            $request->validate(['doctor_id' => 'required|integer|min:1|exists:users,id']);
             $data['doctor_id'] = $request->doctor_id;
         }
 
@@ -155,7 +155,7 @@ class RecordController extends Controller
         {
             $data['doctor_id'] = auth()->user()->id;
         } else {
-            $request->validate(['required|integer|min:1|exists:users,id']);
+            $request->validate(['doctor_id' => 'required|integer|min:1|exists:users,id']);
             $data['doctor_id'] = $request->doctor_id;
         }
 

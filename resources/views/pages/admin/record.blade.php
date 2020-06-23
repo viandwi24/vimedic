@@ -186,7 +186,7 @@
                 },
                 printQrcode(record) {
                     let qrcode = new QRCode("qrcode", {
-                        text: record.code,
+                        text: "{{ route('record.link', ['']) }}/" + record.code,
                         width: 128,
                         height: 128,
                         colorDark : "#000000",
@@ -195,12 +195,12 @@
                     });
                     var html = `
                     <div>
-                        <table border="1">
+                        <table border="1" width="100%">
                             <tr>
-                                <td style="padding: 1rem;">
-                                    <img id="qrcode" style="display: block;">
+                                <td style="padding: 2rem;text-align: center;vertical-align: middle;">
+                                    <img id="qrcode" style="display: inline-block;">
                                 </td>
-                                <td>
+                                <td style="padding: 2rem;">
                                     <table>
                                         <tr style="text-align: left;">
                                             <th>Doctor</th>

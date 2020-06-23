@@ -11,12 +11,19 @@ use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
 
 class RecipeController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('role:admin,doctor,employee')->only('index', 'update');
+        $this->middleware('role:admin,doctor')->except('index', 'update');
+    }
+    
     /**
      * Display a listing of the resource.
      *
@@ -45,12 +52,15 @@ class RecipeController extends Controller
                     $recipe_json = "onclick='vm.editModal(" .
                         json_encode($recipe_arr).
                         ")'";
+                    $delete_el = (auth()->user()->role != "employee") ? '<form method="post" action="'. route('admin.recipe.destroy', [$recipe->id]) .'" style="display:inline;">'.csrf_field().method_field('delete').'<button class="btn btn-sm btn-danger btn-delete"><i class="fa fa-trash"></i></button>' : '';
                     return '
                         <div class="text-center">
                             <button '.$recipe_json.' type="button" class="btn btn-sm btn-warning">
                                 <i class="fa fa-edit"></i>
                             </button>
-                            <form method="post" action="'. route('admin.recipe.destroy', [$recipe->id]) .'" style="display:inline;">'.csrf_field().method_field('delete').'<button class="btn btn-sm btn-danger btn-delete"><i class="fa fa-trash"></i></button>
+                            ' .
+                            $delete_el .
+                            '
                         </dviv>
                     ';
                 })
@@ -64,7 +74,7 @@ class RecipeController extends Controller
         $medicines = (new Select2)->data($medicines)->pattern(['id', 'name']);
 
         // return view
-        return view('pages.admin.recipe.index', compact('doctors', 'medicines'));
+        return view('pages.admin.recipe', compact('doctors', 'medicines'));
     }
 
     /**
@@ -120,8 +130,15 @@ class RecipeController extends Controller
         foreach ($cart_transaction as $item) { $total_price += ($item['price']*$item['stock']); }
         
         DB::transaction(function () use ($total_price, $cart_transaction, $request, $doctor_id) {
+
+            // random code unique
+            $code = Str::random(10) . Carbon::now()->timestamp;
+            while (User::where('code', $code)->get()->count() > 0) {
+                $code = Str::random(10) . Carbon::now()->timestamp;
+            }
+
             $transaction = Recipe::create([
-                "code" => Str::random(10) . Carbon::now()->timestamp,
+                "code" => $code,
                 "doctor_id" => $doctor_id,
                 "total_price" => $total_price,
                 "note" => $request->note,
@@ -170,6 +187,7 @@ class RecipeController extends Controller
         $request->validate([
             'carts' => 'required|json',
             'note' => 'required|nullable|string',
+            'status' => 'required|in:not_yet_taken,already_taken',
         ]);
 
 
@@ -206,6 +224,7 @@ class RecipeController extends Controller
                 "doctor_id" => $doctor_id,
                 "total_price" => $total_price,
                 "note" => $request->note,
+                "status" => $request->status,
             ]);;
             $recipe->medicines()->sync($cart_transaction);
         });

@@ -20,9 +20,13 @@
                                     <a href="#" @click.prevent="addModal" class="dropdown-item">
                                         <i class="fa fa-plus mr-2"></i> New
                                     </a>
-                                    <a href="#" class="dropdown-item">
+                                    <a href="#" @click.prevent="openImport" class="dropdown-item">
                                         <i class="fas fa-file-excel mr-2"></i> Import Excel
                                     </a>
+                                    <form id="import" action="{{ route('admin.medicine.import') }}" method="POST" style="display: none;" enctype="multipart/form-data">
+                                        @csrf
+                                        <input type="file" name="file" @change="importExcel" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+                                    </form>
                                 </div>
                             </div>
                         </span>
@@ -139,6 +143,13 @@
                     let id = this.medicine.id;
                     $('.modal#modal form').attr('action', "{{ route('admin.medicine.index') }}/" + id).submit();
                 },
+                openImport() {
+                    $('form#import input').trigger('click');
+                },
+                importExcel(event) {
+                    if(!event.target.files.length) return 
+                    $('form#import').submit();
+                }
             }
         });
         $('#table').DataTable({
