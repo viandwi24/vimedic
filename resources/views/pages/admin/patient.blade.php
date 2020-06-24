@@ -60,7 +60,7 @@
                     </div>
                     <div class="form-group">
                         <label>Name</label>
-                        <input type="text" name="name" class="form-control" v-model="patient.name">
+                        <input placeholder="Patient Name..." type="text" name="name" class="form-control" v-model="patient.name">
                     </div>
                     <div class="form-group">
                         <label>Identity Number</label>
@@ -77,7 +77,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text">Date</span>
                             </div>
-                            <input type="text" name="birth" class="form-control dateofbirth datetimepicker-input" v-model="patient.birth" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask>
+                            <input type="text" name="birth" class="form-control dateofbirth datetimepicker-input" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask>
                             <div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
                                 <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                             </div>
@@ -85,7 +85,7 @@
                     </div>
                     <div class="form-group">
                         <label>Address</label>
-                        <textarea name="address" class="form-control" v-model="patient.address"></textarea>
+                        <textarea placeholder="Patient Address..." name="address" class="form-control" v-model="patient.address"></textarea>
                     </div>
                 </form>
             </div>
@@ -111,16 +111,17 @@
                 addModal() {
                     this.action = 'create';
                     this.patient = {
-                        name: 'Example',
+                        name: '',
                         identity_number: null,
-                        birth: "01/01/2020",
                         address: ""
                     }
+                    $('.modal#modal form input[name=birth]').val("01/01/2020");
                     $('.modal#modal').modal('show');
                 },
                 editModal(patient) {
                     this.action = 'edit';
                     this.patient = patient
+                    $('.modal#modal form input[name=birth]').val(patient.birth);
                     $('.modal#modal').modal('show');
                 },
                 create() {
@@ -136,6 +137,7 @@
         $('#table').DataTable({
             ajax: "{{ route('admin.patient.index') }}",
             processing: true,
+            serverSide: true,
             order: [[0, 'asc']],
             columnDefs: [ { orderable: false, targets: [5] }, ],
             columns: [

@@ -67,7 +67,7 @@
                     </div>
                     <div class="form-group">
                         <label>Name</label>
-                        <input type="text" name="name" class="form-control" v-model="medicine.name">
+                        <input placeholder="Medicine Name..." type="text" name="name" class="form-control" v-model="medicine.name">
                     </div>
                     <div class="form-group">
                         <label>Type</label>
@@ -124,7 +124,7 @@
                 addModal() {
                     this.action = 'create';
                     this.medicine = {
-                        name: 'Example',
+                        name: '',
                         price: 1000,
                         type: 'capsules',
                         stock: 1,
@@ -155,6 +155,7 @@
         $('#table').DataTable({
             ajax: "{{ route('admin.medicine.index') }}",
             processing: true,
+            serverSide: true,
             order: [[0, 'asc']],
             columnDefs: [ { orderable: false, targets: [5] }, ],
             columns: [

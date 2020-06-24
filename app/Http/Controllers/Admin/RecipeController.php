@@ -33,7 +33,11 @@ class RecipeController extends Controller
     {
         if ($request->ajax())
         {
-            $recipes = Recipe::with('doctor')->get();
+            $recipes = Recipe::with('doctor');
+
+            // this for live search select2 in route(admin.record.index)
+            if ($request->get('q', null) != null) $recipes->where('code', 'LIKE', '%'.$request->get('q', '').'%');
+
             return DataTables::of($recipes)
                 ->addColumn('action', function (Recipe $recipe) {
                     $recipe_arr = $recipe->toArray();
@@ -68,7 +72,7 @@ class RecipeController extends Controller
                         </dviv>
                     ';
                 })
-                ->make();
+                ->make(true);
         }
 
         // get patient data anc convert to Select2 pattern

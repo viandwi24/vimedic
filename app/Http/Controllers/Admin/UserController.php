@@ -20,7 +20,7 @@ class UserController extends Controller
         if ($request->ajax())
         {
             $users = User::query();
-            return DataTables::eloquent($users)
+            return DataTables::of($users)
                 ->addColumn('action', function (User $user) {
                     $user_json = "onclick='vm.editModal(" .
                         json_encode($user).
@@ -34,7 +34,7 @@ class UserController extends Controller
                         </dviv>
                     ';
                 })
-                ->make();
+                ->make(true);
         }
 
         return view('pages.admin.user');

@@ -2,7 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 
-/** Record Link */
+/** Other Route */
+Route::get('/', function () { return redirect()->route('auth.home'); })->name('home');
 Route::get('/record/{code}', 'RecordController@show')->name('record.link');
 
 /**

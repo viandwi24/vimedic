@@ -19,7 +19,11 @@ class PatientController extends Controller
         if ($request->ajax())
         {
             $patients = Patient::query();
-            return DataTables::eloquent($patients)
+
+            // this for live search select2 in route(admin.record.index)
+            if ($request->get('q', null) != null) $patients->where('name', 'LIKE', '%'.$request->get('q', '').'%');
+
+            return DataTables::of($patients)
                 ->addColumn('action', function (Patient $patient) {
                     $patient_json = "onclick='vm.editModal(" .
                         json_encode($patient).
@@ -34,7 +38,7 @@ class PatientController extends Controller
                         </dviv>
                     ';
                 })
-                ->make();
+                ->make(true);
         }
 
         return view('pages.admin.patient');

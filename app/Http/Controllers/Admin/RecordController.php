@@ -24,14 +24,15 @@ class RecordController extends Controller
     {
         if ($request->ajax())
         {
-            $records = Record::with('doctor', 'patient', 'recipe')->get();
+            $records = Record::with('doctor', 'patient', 'recipe');
             return DataTables::of($records)
                 ->addColumn('action', function (Record $record) {
+                    $record_arr = $record->toArray();
                     $record_json = "onclick='vm.editModal(" .
-                        json_encode($record).
+                        json_encode($record_arr).
                         ")'";
                     $record_action_qrcode = "onclick='vm.printQrcode(" .
-                        json_encode($record).
+                        json_encode($record_arr).
                         ")'";
                     $action = "!confirm('Delete this item?') ? event.preventDefault() : console.log(1)";
                     return '
@@ -46,19 +47,19 @@ class RecordController extends Controller
                         </dviv>
                     ';
                 })
-                ->make();
+                ->make(true);
         }
 
         // get patient data anc convert to Select2 pattern
         $doctors = User::select('id', 'name')->where('role', 'doctor')->get();
         $doctors = (new Select2)->data($doctors)->pattern(['id', 'name']);
-        $patients = Patient::select('id', 'name')->get();
-        $patients = (new Select2)->data($patients)->pattern(['id', 'name']);
-        $recipes = Recipe::select('id', 'code')->get();
-        $recipes = (new Select2)->data($recipes)->pattern(['id', 'code']);
+        // $patients = Patient::select('id', 'name')->get();
+        // $patients = (new Select2)->data($patients)->pattern(['id', 'name']);
+        // $recipes = Recipe::select('id', 'code')->get();
+        // $recipes = (new Select2)->data($recipes)->pattern(['id', 'code']);
 
         // return view
-        return view('pages.admin.record', compact('doctors', 'patients', 'recipes'));
+        return view('pages.admin.record', compact('doctors'));
     }
 
     /**

@@ -22,7 +22,7 @@ class MedicineController extends Controller
         if ($request->ajax())
         {
             $medicines = Medicine::query();
-            return DataTables::eloquent($medicines)
+            return DataTables::of($medicines)
                 ->addColumn('action', function (Medicine $medicine) {
                     $medicine_json = "onclick='vm.editModal(" .
                         json_encode($medicine).
@@ -37,7 +37,7 @@ class MedicineController extends Controller
                         </dviv>
                     ';
                 })
-                ->make();
+                ->make(true);
         }
 
         return view('pages.admin.medicine');

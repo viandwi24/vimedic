@@ -110,7 +110,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text">Date</span>
                             </div>
-                            <input type="text" name="check_date" class="form-control checkdate datetimepicker-input" v-model="record.check_date" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask>
+                            <input type="text" name="check_date" class="form-control checkdate datetimepicker-input" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask>
                             <div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
                                 <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                             </div>
@@ -137,8 +137,6 @@
                 action: 'create',
                 record: {},
                 doctors: @JSON($doctors->array()),
-                patients: @JSON($patients->array()),
-                recipes: @JSON($recipes->array()),
                 carts: [],
             },
             computed: {
@@ -151,8 +149,44 @@
             methods: {
                 loadSelect2() {
                     $('#selectDoctor').select2({ data: this.doctors });
-                    $('#selectPatient').select2({ data: this.patients });
-                    $('#selectRecipe').select2({ data: this.recipes });
+                    // $('#selectPatient').select2({ data: this.patients });
+                    // $('#selectRecipe').select2({ data: this.recipes });
+                    $('#selectPatient').select2({
+                        ajax: {
+                            url: "{{ route('admin.patient.index') }}",
+                            dataType: 'json',
+                            delay: 250,
+                            data: function (params) {
+                                var query = { q: params.term };
+                                return query;
+                            },
+                            processResults: function (data) {
+                                return {
+                                    results: data.data.map(e => { return {id: e.id, text: e.id + ' - ' + e.name} })
+                                };
+                            }
+                        },
+                        placeholder: 'Search for a patient with name',
+                        minimumInputLength: 3,
+                    });
+                    $('#selectRecipe').select2({
+                        ajax: {
+                            url: "{{ route('admin.recipe.index') }}",
+                            dataType: 'json',
+                            delay: 250,
+                            data: function (params) {
+                                var query = { q: params.term };
+                                return query;
+                            },
+                            processResults: function (data) {
+                                return {
+                                    results: data.data.map(e => { return {id: e.id, text: e.id + ' - ' + e.code} })
+                                };
+                            }
+                        },
+                        placeholder: 'Search for a recipe with code',
+                        minimumInputLength: 3,
+                    });
 
                     @if(auth()->check() && auth()->user()->role == "doctor")
                         $('#selectDoctor').attr('disabled', true);
@@ -161,15 +195,15 @@
                 addModal() {
                     this.action = 'create';
                     this.record = {
-                        doctor: null,
-                        patient: null,
-                        recipe: null,
+                        doctor_id: null,
+                        patient_id: null,
+                        recipe_id: null,
                         checkup: "",
                         diagnosis: "",
                         action: "",
                         cost: 1000,
-                        check_date: "01/01/2020",
                     }
+                    $('.modal#modal form input[name=check_date]').val("01/01/2020");
                     this.loadSelect2();
 
                     @if(auth()->check() && auth()->user()->role == "doctor")
@@ -181,14 +215,12 @@
                 editModal(record) {
                     this.action = 'edit';
                     this.record = record;
-                    this.record.doctor = this.record.doctor_id;
-                    this.record.patient = this.record.patient_id;
-                    this.record.recipe = this.record.recipe_id;
+                    $('.modal#modal form input[name=check_date]').val(record.check_date);
                     this.loadSelect2();
                     this.carts = this.record.medicines;
-                    $('#selectDoctor').val(this.record.doctor).trigger('change').trigger('click');
-                    $('#selectPatient').val(this.record.patient).trigger('change').trigger('click');
-                    $('#selectRecipe').val(this.record.recipe).trigger('change').trigger('click');
+                    $('#selectDoctor').val(this.record.doctor_id).trigger('change').trigger('click');
+                    $('#selectPatient').append(`<option value="${record.patient.id}" selected="selected">${record.patient.id}&nbsp;-&nbsp;${record.patient.name}</option>`).trigger('change');
+                    $('#selectRecipe').append(`<option value="${record.recipe.id}" selected="selected">${record.recipe.id}&nbsp;-&nbsp;${record.recipe.code}</option>`).trigger('change');
                     $('.modal#modal').modal('show');
                 },
                 create() {
@@ -260,6 +292,7 @@
         $('#table').DataTable({
             ajax: "{{ route('admin.record.index') }}",
             processing: true,
+            serverSide: true,
             order: [[0, 'asc']],
             columnDefs: [ { orderable: false, targets: [3] }, ],
             columns: [

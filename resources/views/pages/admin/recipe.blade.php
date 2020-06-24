@@ -218,6 +218,7 @@
         $('#table').DataTable({
             ajax: "{{ route('admin.recipe.index') }}",
             processing: true,
+            serverSide: true,
             order: [[0, 'asc']],
             columnDefs: [ { orderable: false, targets: [3] }, ],
             columns: [

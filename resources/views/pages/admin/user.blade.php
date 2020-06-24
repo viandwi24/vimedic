@@ -62,7 +62,7 @@
                     </div>
                     <div class="form-group">
                         <label>Name</label>
-                        <input type="text" name="name" class="form-control" v-model="user.name">
+                        <input placeholder="Name..." type="text" name="name" class="form-control" v-model="user.name">
                     </div>
                     <div class="form-group">
                         <label>Role</label>
@@ -72,11 +72,11 @@
                     </div>
                     <div class="form-group">
                         <label>Username</label>
-                        <input type="text" name="username" class="form-control" v-model="user.username">
+                        <input placeholder="Username..." type="text" name="username" class="form-control" v-model="user.username">
                     </div>
                     <div class="form-group">
                         <label>Password</label>
-                        <input type="text" name="password" class="form-control" v-model="user.password">
+                        <input placeholder="Password..." type="text" name="password" class="form-control" v-model="user.password">
                         <span class="text-muted" v-if="action == 'edit'">* Type password when you want to change.</span>
                     </div>
                 </form>
@@ -108,7 +108,7 @@
                 addModal() {
                     this.action = 'create';
                     this.user = {
-                        name: 'Example',
+                        name: '',
                         username: '',
                         role: 'admin',
                         password: ''
@@ -132,6 +132,7 @@
         $('#table').DataTable({
             ajax: "{{ route('admin.user.index') }}",
             processing: true,
+            serverSide: true,
             order: [[0, 'asc']],
             columnDefs: [ { orderable: false, targets: [3] }, ],
             columns: [
