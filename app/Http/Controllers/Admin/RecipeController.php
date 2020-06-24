@@ -39,6 +39,9 @@ class RecipeController extends Controller
             if ($request->get('q', null) != null) $recipes->where('code', 'LIKE', '%'.$request->get('q', '').'%');
 
             return DataTables::of($recipes)
+                ->addColumn('total_price', function (Recipe $recipe) {
+                    return "Rp " . number_format($recipe->total_price,2,',','.');
+                })
                 ->addColumn('action', function (Recipe $recipe) {
                     $recipe_arr = $recipe->toArray();
                     $medicines = [];

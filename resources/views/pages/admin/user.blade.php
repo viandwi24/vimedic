@@ -20,9 +20,6 @@
                                     <a href="#" @click.prevent="addModal" class="dropdown-item">
                                         <i class="fa fa-plus mr-2"></i> New
                                     </a>
-                                    <a href="#" class="dropdown-item">
-                                        <i class="fas fa-file-excel mr-2"></i> Import Excel
-                                    </a>
                                 </div>
                             </div>
                         </span>
