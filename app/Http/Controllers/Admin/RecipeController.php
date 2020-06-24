@@ -52,7 +52,11 @@ class RecipeController extends Controller
                     $recipe_json = "onclick='vm.editModal(" .
                         json_encode($recipe_arr).
                         ")'";
-                    $delete_el = (auth()->user()->role != "employee") ? '<form method="post" action="'. route('admin.recipe.destroy', [$recipe->id]) .'" style="display:inline;">'.csrf_field().method_field('delete').'<button class="btn btn-sm btn-danger btn-delete"><i class="fa fa-trash"></i></button>' : '';
+                    
+                    
+                    $action = "!confirm('Delete this item?') ? event.preventDefault() : console.log(1)";
+                    $delete_el = (auth()->user()->role != "employee") ? '<form method="post" action="'. route('admin.recipe.destroy', [$recipe->id]) .'" style="display:inline;">'.csrf_field().method_field('delete').'<button onclick="'.$action.'" class="btn btn-sm btn-danger btn-delete"><i class="fa fa-trash"></i></button>' : '';
+
                     return '
                         <div class="text-center">
                             <button '.$recipe_json.' type="button" class="btn btn-sm btn-warning">
@@ -133,7 +137,7 @@ class RecipeController extends Controller
 
             // random code unique
             $code = Str::random(10) . Carbon::now()->timestamp;
-            while (User::where('code', $code)->get()->count() > 0) {
+            while (Recipe::where('code', $code)->get()->count() > 0) {
                 $code = Str::random(10) . Carbon::now()->timestamp;
             }
 

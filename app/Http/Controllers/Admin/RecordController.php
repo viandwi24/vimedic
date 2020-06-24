@@ -33,6 +33,7 @@ class RecordController extends Controller
                     $record_action_qrcode = "onclick='vm.printQrcode(" .
                         json_encode($record).
                         ")'";
+                    $action = "!confirm('Delete this item?') ? event.preventDefault() : console.log(1)";
                     return '
                         <div class="text-center">
                             <button '.$record_action_qrcode.' type="button" class="btn btn-sm btn-primary">
@@ -41,7 +42,7 @@ class RecordController extends Controller
                             <button '.$record_json.' type="button" class="btn btn-sm btn-warning">
                                 <i class="fa fa-edit"></i>
                             </button>
-                            <form method="post" action="'. route('admin.record.destroy', [$record->id]) .'" style="display:inline;">'.csrf_field().method_field('delete').'<button class="btn btn-sm btn-danger btn-delete"><i class="fa fa-trash"></i></button>
+                            <form method="post" action="'. route('admin.record.destroy', [$record->id]) .'" style="display:inline;">'.csrf_field().method_field('delete').'<button  onclick="'.$action.'" class="btn btn-sm btn-danger btn-delete"><i class="fa fa-trash"></i></button>
                         </dviv>
                     ';
                 })
@@ -85,13 +86,19 @@ class RecordController extends Controller
             'diagnosis' => 'required|string|min:1',
             'action' => 'required|string|min:1',
             'cost' => 'required|integer|min:1',
+            'check_date' => 'required|date|date_format:d/m/Y',
         ]);
 
         $data = $request->only(
             'patient_id', 'checkup', 'recipe_id',
-            'diagnosis', 'action', 'cost'
+            'diagnosis', 'action', 'cost', 'check_date'
         );
+
+        // random code unique
         $data['code'] = Str::random(10) . Carbon::now()->timestamp;
+        while (Record::where('code', $data['code'])->get()->count() > 0) {
+            $data['code'] = Str::random(10) . Carbon::now()->timestamp;
+        }
 
         if (auth()->check() && auth()->user()->role == "doctor")
         {
@@ -144,11 +151,12 @@ class RecordController extends Controller
             'diagnosis' => 'required|string|min:1',
             'action' => 'required|string|min:1',
             'cost' => 'required|integer|min:1',
+            'check_date' => 'required|date_format:d/m/Y',
         ]);
 
         $data = $request->only(
             'patient_id', 'doctor_id', 'checkup', 'recipe_id',
-            'diagnosis', 'action', 'cost'
+            'diagnosis', 'action', 'cost', 'check_date'
         );
 
         if (auth()->check() && auth()->user()->role == "doctor")

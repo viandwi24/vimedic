@@ -23,6 +23,7 @@ class CreateRecordsTable extends Migration
             $table->string("diagnosis");
             $table->string("action");
             $table->integer("cost");
+            $table->date('check_date');
             $table->timestamps();
             
             $table->foreign('doctor_id')->references('id')->on('users')

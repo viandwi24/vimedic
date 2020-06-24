@@ -27,12 +27,13 @@ class MedicineController extends Controller
                     $medicine_json = "onclick='vm.editModal(" .
                         json_encode($medicine).
                         ")'";
+                    $action = "!confirm('Delete this item?') ? event.preventDefault() : console.log(1)";
                     return '
                         <div class="text-center">
                             <button '.$medicine_json.' type="button" class="btn btn-sm btn-warning">
                                 <i class="fa fa-edit"></i>
                             </button>
-                            <form method="post" action="'. route('admin.medicine.destroy', [$medicine->id]) .'" style="display:inline;">'.csrf_field().method_field('delete').'<button class="btn btn-sm btn-danger btn-delete"><i class="fa fa-trash"></i></button>
+                            <form method="post" action="'. route('admin.medicine.destroy', [$medicine->id]) .'" style="display:inline;">'.csrf_field().method_field('delete').'<button onclick="'.$action.'" class="btn btn-sm btn-danger btn-delete"><i class="fa fa-trash"></i></button>
                         </dviv>
                     ';
                 })

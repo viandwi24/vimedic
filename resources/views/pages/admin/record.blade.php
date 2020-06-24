@@ -30,9 +30,10 @@
                                 <th width="6%">#</th>
                                 <th>Patient</th>
                                 <th>Doctor</th>
-                                <th>Recipe Code</th>
                                 <th>Record Code</th>
-                                <th class="text-center">...</th>
+                                <th>Recipe Code</th>
+                                <th>Check Date</th>
+                                <th class="text-center" width="15%">...</th>
                             </thead>
                         </table>
                     </div>
@@ -103,6 +104,18 @@
                             <input type="number" min="0" name="cost" class="form-control" v-model="record.cost">
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label>Check Date</label>
+                        <div class="input-group date" id="reservationdate" data-target-input="nearest">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">Date</span>
+                            </div>
+                            <input type="text" name="check_date" class="form-control checkdate datetimepicker-input" v-model="record.check_date" data-inputmask-alias="datetime" data-inputmask-inputformat="dd/mm/yyyy" data-mask>
+                            <div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
+                                <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                            </div>
+                        </div>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -155,6 +168,7 @@
                         diagnosis: "",
                         action: "",
                         cost: 1000,
+                        check_date: "01/01/2020",
                     }
                     this.loadSelect2();
 
@@ -222,6 +236,11 @@
                                             <td>:</td>
                                             <td>${record.recipe.code}</td>
                                         </tr>
+                                        <tr style="text-align: left;">
+                                            <th>Check Date</th>
+                                            <td>:</td>
+                                            <td>${record.check_date}</td>
+                                        </tr>
                                     </table>
                                 </td>
                             </tr>
@@ -247,15 +266,24 @@
                 { render: (data, type, row, meta) => meta.row + meta.settings._iDisplayStart + 1 },
                 { data: 'patient.name' },
                 { data: 'doctor.name' },
-                { data: 'recipe.code' },
                 { data: 'code' },
+                { data: 'recipe.code' },
+                { data: 'check_date' },
                 { data: 'action' },
             ]
         });
-    </script>    
+
+        $(document).ready(() => {
+            $('.checkdate').inputmask('dd/mm/yyyy', { 'placeholder': 'dd/mm/yyyy' });
+            $('#reservationdate').datetimepicker({
+                format: 'DD/MM/YYYY'
+            });
+        });
+    </script>
 @endpush
 
 @push('css-lib')
+    <link rel="stylesheet" href="{{ asset('assets/plugins/daterangepicker/daterangepicker.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/plugins/select2/css/select2.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
@@ -263,6 +291,8 @@
 @endpush
 
 @push('js-lib')
+    <script src="{{ asset('assets/plugins/inputmask/min/jquery.inputmask.bundle.min.js') }}"></script>
+    <script src="{{ asset('assets/plugins/daterangepicker/daterangepicker.js') }}"></script>
     <script src="{{ asset('assets/plugins/select2/js/select2.full.min.js') }}"></script>
     <script src="{{ asset('assets/plugins/datatables/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>

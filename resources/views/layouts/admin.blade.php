@@ -35,6 +35,7 @@
             font-weight: 400;
             margin: 0;
         }
+        .table.dataTable { width: 100% !important; }
     </style>
     @stack('css')
     <!-- other -->

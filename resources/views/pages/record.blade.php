@@ -66,6 +66,12 @@
                                     <div class="p-2">
                                         <form class="form-horizontal" role="form">
                                             <div class="form-group row">
+                                                <label class="col-sm-2  col-form-label" for="simpleinput">Check Date</label>
+                                                <div class="col-sm-10">
+                                                    <input name="name" value="{{ $record->check_date }}" type="text" class="form-control" disabled>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
                                                 <label class="col-sm-2  col-form-label" for="simpleinput">Checkup</label>
                                                 <div class="col-sm-10">
                                                     <input name="name" value="{{ $record->checkup }}" type="text" class="form-control" disabled>

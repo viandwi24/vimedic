@@ -103,7 +103,7 @@
                                 <tr v-for="(item, i) in carts" :key="i">
                                     <td>@{{ item.name }}</td>
                                     <td>
-                                        x <input type="number" min="1" style="width: 50px;" v-model="item.stock" :max="item.max">
+                                        x <input type="number" class="form-control form-control-sm" min="1" style="width: 50px;display: inline-block;" v-model="item.stock" :max="item.max">
                                         <button class="btn btn-sm btn-danger" @click.prevent="delCart(i)">
                                             <i class="fa fa-times"></i>
                                         </button>

@@ -32,7 +32,7 @@
                                 <th>Identity Number</th>
                                 <th>Date of Birth</th>
                                 <th>Address</th>
-                                <th class="text-center">...</th>
+                                <th class="text-center" width="15%">...</th>
                             </thead>
                         </table>
                     </div>
@@ -63,7 +63,7 @@
                         <input type="text" name="name" class="form-control" v-model="patient.name">
                     </div>
                     <div class="form-group">
-                        <label>Identity Number <small>(nik, dll)</small></label>
+                        <label>Identity Number</label>
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text">Number</span>

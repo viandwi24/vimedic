@@ -24,12 +24,13 @@ class PatientController extends Controller
                     $patient_json = "onclick='vm.editModal(" .
                         json_encode($patient).
                         ")'";
+                    $action = "!confirm('Delete this item?') ? event.preventDefault() : console.log(1)";
                     return '
                         <div class="text-center">
                             <button '.$patient_json.' type="button" class="btn btn-sm btn-warning">
                                 <i class="fa fa-edit"></i>
                             </button>
-                            <form method="post" action="'. route('admin.patient.destroy', [$patient->id]) .'" style="display:inline;">'.csrf_field().method_field('delete').'<button class="btn btn-sm btn-danger btn-delete"><i class="fa fa-trash"></i></button>
+                            <form method="post" action="'. route('admin.patient.destroy', [$patient->id]) .'" style="display:inline;">'.csrf_field().method_field('delete').'<button onclick="'.$action.'" class="btn btn-sm btn-danger btn-delete"><i class="fa fa-trash"></i></button>
                         </dviv>
                     ';
                 })
@@ -60,7 +61,7 @@ class PatientController extends Controller
         $request->validate([
             'name' => 'required|string|min:3',
             'identity_number' => 'required|integer|min:6',
-            'birth' => 'required|date|date_format:d/m/Y',
+            'birth' => 'required|date_format:d/m/Y',
             'address' => 'required|string|min:6'
         ]);
         
