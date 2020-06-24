@@ -86,7 +86,7 @@ class RecordController extends Controller
             'diagnosis' => 'required|string|min:1',
             'action' => 'required|string|min:1',
             'cost' => 'required|integer|min:1',
-            'check_date' => 'required|date|date_format:d/m/Y',
+            'check_date' => 'required|date_format:d/m/Y',
         ]);
 
         $data = $request->only(
