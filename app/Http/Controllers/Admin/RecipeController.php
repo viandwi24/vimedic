@@ -195,51 +195,62 @@ class RecipeController extends Controller
      */
     public function update(Request $request, Recipe $recipe)
     {
-        $request->validate([
-            'carts' => 'required|json',
-            'note' => 'required|nullable|string',
-            'status' => 'required|in:not_yet_taken,already_taken',
-        ]);
+        $user_check = auth()->check();
+        $user_role = ($user_check) ? auth()->user()->role : "";
 
-
-        if (auth()->check() && auth()->user()->role == "doctor")
+        // if employee
+        if ($user_check && $user_role == "employee")
         {
-            $doctor_id = auth()->user()->id;
+            $request->validate(['status' => 'required|in:not_yet_taken,already_taken']);
+            $recipe->update([ 'status' => $request->status ]);
         } else {
-            $request->validate(['doctor_id' => 'required|integer|exists:users,id']);
-            $doctor_id = $request->doctor_id;
-        }
 
-        $carts = json_decode($request->carts);
-        $carts_collection = new Collection($carts);
-
-        // 
-        $medicine_cart = Medicine::whereIn("id", $carts_collection->pluck('id'))->get();
-        $cart_transaction = [];
-        foreach($medicine_cart as $medicine) {
-            $cart = array_search($medicine->id, array_column($carts, 'id') );
-            if ($cart !== false) {
-                $cart_transaction[$medicine->id] = [
-                    'medicine_id' => $medicine->id,
-                    'stock' => $carts[$cart]->stock,
-                    'price' => $medicine->price
-                ];
+            // admin + doctor
+            $request->validate([
+                'carts' => 'required|json',
+                'note' => 'required|nullable|string',
+                'status' => 'required|in:not_yet_taken,already_taken',
+            ]);
+            if ($user_check && $user_role == "doctor")
+            {
+                $doctor_id = auth()->user()->id;
+            } else {
+                $request->validate(['doctor_id' => 'required|integer|exists:users,id']);
+                $doctor_id = $request->doctor_id;
             }
+
+            $carts = json_decode($request->carts);
+            $carts_collection = new Collection($carts);
+
+            // 
+            $medicine_cart = Medicine::whereIn("id", $carts_collection->pluck('id'))->get();
+            $cart_transaction = [];
+            foreach($medicine_cart as $medicine) {
+                $cart = array_search($medicine->id, array_column($carts, 'id') );
+                if ($cart !== false) {
+                    $cart_transaction[$medicine->id] = [
+                        'medicine_id' => $medicine->id,
+                        'stock' => $carts[$cart]->stock,
+                        'price' => $medicine->price
+                    ];
+                }
+            }
+
+            $total_price = 0;
+            foreach ($cart_transaction as $item) { $total_price += ($item['price']*$item['stock']); }
+            
+            DB::transaction(function () use ($total_price, $cart_transaction, $request, $recipe, $doctor_id) {
+                $update = $recipe->update([
+                    "doctor_id" => $doctor_id,
+                    "total_price" => $total_price,
+                    "note" => $request->note,
+                    "status" => $request->status,
+                ]);;
+                $recipe->medicines()->sync($cart_transaction);
+            });
         }
 
-        $total_price = 0;
-        foreach ($cart_transaction as $item) { $total_price += ($item['price']*$item['stock']); }
         
-        DB::transaction(function () use ($total_price, $cart_transaction, $request, $recipe, $doctor_id) {
-            $update = $recipe->update([
-                "doctor_id" => $doctor_id,
-                "total_price" => $total_price,
-                "note" => $request->note,
-                "status" => $request->status,
-            ]);;
-            $recipe->medicines()->sync($cart_transaction);
-        });
-
         return redirect()->route('admin.recipe.index')->with('alert', ['type' => 'success', 'text' => 'Update data successfully.']);
     }
 
