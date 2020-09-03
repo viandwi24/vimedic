@@ -13,8 +13,31 @@
     <link rel="stylesheet" href="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/plugins/toastr/toastr.min.css') }}">
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+    <style>
+    .bg-image {
+        background-repeat:no-repeat;
+        background-position: center center;
+        background: url({{ asset('assets/bg.jpeg') }});
+    }
+    .bg-overlay {
+        width: 100vw;
+        height: 100vh;
+        display: block;
+        background: rgba(0, 0, 0, .5);
+        position: fixed;
+        z-index: 10;
+    }
+    .login-box {
+        z-index: 11;
+    }
+    .login-logo a {
+        color: white;
+        font-weight: bold;
+    }
+    </style>
 </head>
-<body class="hold-transition login-page">
+<body class="hold-transition login-page bg-image">
+    <div class="bg-overlay"></div>
     <div class="login-box">
         <div class="login-logo">
             <a href=""><b>Vi</b>medic</a>
