@@ -53,7 +53,6 @@
                         </div>
                     </div>
 
-
                     <div class="card shadow mb-4">
                         <div class="card-header">
                             <h5 class="mt-0 header-title">
@@ -61,89 +60,91 @@
                             </h5>
                         </div>
                         <div class="card-body">
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="p-2">
-                                        <form class="form-horizontal" role="form">
-                                            <div class="form-group row">
-                                                <label class="col-sm-2  col-form-label" for="simpleinput">Check Date</label>
-                                                <div class="col-sm-10">
-                                                    <input name="name" value="{{ $record->check_date }}" type="text" class="form-control" disabled>
-                                                </div>
+                            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                                <li class="nav-item">
+                                  <a class="nav-link active" id="record-tab" data-toggle="tab" href="#record" role="tab" aria-controls="record" aria-selected="true">Record</a>
+                                </li>
+                                <li class="nav-item">
+                                  <a class="nav-link" id="recipe-tab" data-toggle="tab" href="#recipe" role="tab" aria-controls="recipe" aria-selected="false">Recipe</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content" id="myTabContent">
+                                <div class="tab-pane pt-4 fade show active" id="record" role="tabpanel" aria-labelledby="record-tab">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="p-2">
+                                                <form class="form-horizontal" role="form">
+                                                    <div class="form-group row">
+                                                        <label class="col-sm-2  col-form-label" for="simpleinput">Check Date</label>
+                                                        <div class="col-sm-10">
+                                                            <input name="name" value="{{ $record->check_date }}" type="text" class="form-control" disabled>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <label class="col-sm-2  col-form-label" for="simpleinput">Checkup</label>
+                                                        <div class="col-sm-10">
+                                                            <input name="name" value="{{ $record->checkup }}" type="text" class="form-control" disabled>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <label class="col-sm-2  col-form-label" for="simpleinput">Diagnosis</label>
+                                                        <div class="col-sm-10">
+                                                            <input name="name" value="{{ $record->diagnosis }}" type="text" class="form-control" disabled>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <label class="col-sm-2  col-form-label" for="simpleinput">Action</label>
+                                                        <div class="col-sm-10">
+                                                            <input name="name" value="{{ $record->action }}" type="text" class="form-control" disabled>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <label class="col-sm-2  col-form-label" for="simpleinput">Cost</label>
+                                                        <div class="col-sm-10">
+                                                            <input name="name" value="Rp {{ number_format($record->cost,2,',','.') }}" type="text" class="form-control" disabled>
+                                                        </div>
+                                                    </div>
+                                                </form>
                                             </div>
-                                            <div class="form-group row">
-                                                <label class="col-sm-2  col-form-label" for="simpleinput">Checkup</label>
-                                                <div class="col-sm-10">
-                                                    <input name="name" value="{{ $record->checkup }}" type="text" class="form-control" disabled>
-                                                </div>
-                                            </div>
-                                            <div class="form-group row">
-                                                <label class="col-sm-2  col-form-label" for="simpleinput">Diagnosis</label>
-                                                <div class="col-sm-10">
-                                                    <input name="name" value="{{ $record->diagnosis }}" type="text" class="form-control" disabled>
-                                                </div>
-                                            </div>
-                                            <div class="form-group row">
-                                                <label class="col-sm-2  col-form-label" for="simpleinput">Action</label>
-                                                <div class="col-sm-10">
-                                                    <input name="name" value="{{ $record->action }}" type="text" class="form-control" disabled>
-                                                </div>
-                                            </div>
-                                            <div class="form-group row">
-                                                <label class="col-sm-2  col-form-label" for="simpleinput">Cost</label>
-                                                <div class="col-sm-10">
-                                                    <input name="name" value="Rp {{ number_format($record->cost,2,',','.') }}" type="text" class="form-control" disabled>
-                                                </div>
-                                            </div>
-                                        </form>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <div class="card shadow mb-4">
-                        <div class="card-header">
-                            <h5 class="mt-0 header-title" style="display: inline-block;">
-                                <i class="mdi mdi-cart"></i>
-                                Recipe
-                            </h5>
-                        </div>
-                        <div class="card-body card-responsive">
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="form-group">
-                                        <label>Note :</label>
-                                        <textarea readonly class="form-control">{{ $record->recipe->note }}</textarea>
+                                <div class="tab-pane pt-4 fade" id="recipe" role="tabpanel" aria-labelledby="recipe-tab">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="form-group">
+                                                <label>Note :</label>
+                                                <textarea readonly class="form-control">{{ $record->recipe->note }}</textarea>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Doctor :</label>
+                                                <input type="text" value="{{ $record->recipe->doctor->name }}" class="form-control" readonly>
+                                            </div>
+                                            <table id="table" class="table table-bordered table-bordered dt-responsive nowrap">
+                                                <thead>
+                                                    <th>#</th>
+                                                    <th>Medicine</th>
+                                                    <th>Stock</th>
+                                                    <th>Total</th>
+                                                </thead>
+                                                <tbody>
+                                                    @php $i = 1; @endphp
+                                                    @foreach ($record->recipe->medicines as $item)
+                                                        <tr>
+                                                            <td>{{ $i++ }}</td>
+                                                            <td>{{ $item->name }}</td>
+                                                            <td>{{ $item->pivot->stock }}</td>
+                                                            <td>Rp {{ $item->pivot->stock*$item->pivot->price }}</td>
+                                                        </tr>                                    
+                                                    @endforeach
+                                                    <tr>
+                                                        <th colspan="3" class="text-right pr-4">Total :</th>
+                                                        <th>Rp {{ $record->recipe->total_price }}</th>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
-                                    <div class="form-group">
-                                        <label>Doctor :</label>
-                                        <input type="text" value="{{ $record->recipe->doctor->name }}" class="form-control" readonly>
-                                    </div>
-                                    <table id="table" class="table table-bordered table-bordered dt-responsive nowrap">
-                                        <thead>
-                                            <th>#</th>
-                                            <th>Medicine</th>
-                                            <th>Stock</th>
-                                            <th>Total</th>
-                                        </thead>
-                                        <tbody>
-                                            @php $i = 1; @endphp
-                                            @foreach ($record->recipe->medicines as $item)
-                                                <tr>
-                                                    <td>{{ $i++ }}</td>
-                                                    <td>{{ $item->name }}</td>
-                                                    <td>{{ $item->pivot->stock }}</td>
-                                                    <td>Rp {{ $item->pivot->stock*$item->pivot->price }}</td>
-                                                </tr>                                    
-                                            @endforeach
-                                            <tr>
-                                                <th colspan="3" class="text-right pr-4">Total :</th>
-                                                <th>Rp {{ $record->recipe->total_price }}</th>
-                                            </tr>
-                                        </tbody>
-                                    </table>
                                 </div>
                             </div>
                         </div>
